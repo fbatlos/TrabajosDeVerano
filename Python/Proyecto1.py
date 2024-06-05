@@ -1,6 +1,6 @@
 #construirás un juego donde la computadora tiene que adivinar el número correcto.
 
-from random import Random
+import random
 
 
 class inputs:
@@ -26,36 +26,39 @@ class output:
 class gameNumber(inputs , output):
 
     def __init__(self):
-        self.__obtenerNum
+       
         self.__comprobarNum
-        
-    def obtenerNum(self) -> int:
-        return Random.randint(1,10)
 
-    def comprobarNum(self):
-        if(self.num == self.numWin):
-            self.winner = True
-        else:
-            output.showMensage("Casi pero no ....",True)
+    def comprobarNum(self,numwin):
+        try:
+            if(int(self.num) == numwin):
+                return True
+            else:
+                output.showMensage("Casi pero no ....",True)
+                return False
+        except ValueError:
+            output.showMensage("No puedes meter letras",True)
+            return False
+        
 
     def start(self): 
-        self.winner= False   
+        winner= False   
         
         output.showMensage("Adivina el numero que estoy pensando del 1-10",True)
 
         output.showMensage("Se inicia el juego ....",False)
         
-        self.numwin = self.__obtenerNum
+        numwin = random.randint(0, 10)
 
         inputs.pedirNum(self,"Dame tu primer numero : ")
 
-        while(self.winner == False):
-            self.__comprobarNum(self)
-            inputs.pedirNum(self,"Dame otro numero a ver si ahora si lo adivinas : ")
+        while(winner == False):
+            winner = self.__comprobarNum(numwin)
+            if(winner == False):
+                inputs.pedirNum(self,"Dame otro numero a ver si ahora si lo adivinas : ")
         
-        output.showMensage("Has ganado !!!")
-    
-    __obtenerNum = obtenerNum
+        output.showMensage("Has ganado !!!",True)
+
 
     __comprobarNum = comprobarNum
 
