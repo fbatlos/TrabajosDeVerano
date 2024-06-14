@@ -18,7 +18,7 @@ class inputs:
     __pedirLetra = pedirLetra
 
     def pedirNombre(self,text):
-        self.nombre = input(text)
+        return input(text)
     __pedirNombre = pedirNombre
 
 class output:
@@ -33,61 +33,137 @@ class output:
 
 
 
-class tablero():
+class Tablero():
     def __init__(self):
-        output.showMensage("el juego comienza",True)
-        self.tablero = []
-        for columna in range(0,4):
-            self.tablero.append([])
-            for fila in range(0,8):
-                self.tablero[columna].append("")
-       
+        output.showMensage("El juego comienza  ",True)
+        self.tablero =  [["" for _ in range(8)] for _ in range(4)]       
     
-    def comprobarInput(self , num:int , letra:str):
-        
-        if(int(num) in range(1,3)):
-            posX = ["A","B","C","D","E","F","G","H"].index(letra)
-            player.colocarMarca(self,int(num),posX)
-        else:
-            raise ValueError        
-        
-        
-        
-    
+    def comprobarInput(self, num: int, letra: str, player):
+        try:
+            num = int(num)
+        except ValueError:
+            raise ValueError("El número debe ser un entero.")
 
-class player():
-    def __init__(self,tablero:tablero):
-        self.__nombre = inputs.pedirNombre(self,"Dime tu nombre : ")
-        self.__tablero = tablero
+        if num in range(1, 5):
+            posX = ["A", "B", "C", "D", "E", "F", "G", "H"]
+            if letra.upper() in posX:
+                posY = num - 1
+                posX_index = posX.index(letra.upper())
+                player.colocarMarca(posY, posX_index)
+            else:
+                raise ValueError("Letra fuera de rango.")
+        else:
+            raise ValueError("Número fuera de rango.")     
+
+    def comprobarGanador(self):
+        for filas in self.tablero:
+            if(filas.__contains__("X")):
+                return False
+        return True
+
+class Player():
+    def __init__(self,tablero:Tablero):
+        self.nombre = inputs.pedirNombre(self,"Dime tu nombre : ")
+        self.tableroClass = tablero
+        self.comprobarMarca
         
     def colocarBarcos(self):
         contadorDeBarcos = 0
 
-        while(contadorDeBarcos <10):
+        while(contadorDeBarcos <=10):
             contadorDeBarcos = 0
             columna = random.randint(0,3)
             fila = random.randint(0,7)
 
             match(random.randint(1,2)):
                 case 1:
-                    self.__tablero.tablero = barcos.barcoDeUno(self.__tablero.tablero,fila,columna)
-                    
-                    for filas in self.__tablero.tablero:
-                        contadorDeBarcos += filas.count("X") 
+                    self.tableroClass.tablero = Barcos.barcoDeUno(self.tableroClass.tablero,fila,columna)
                     
                 case 2:
-                    self.__tablero.tablero = (barcos.barcoDeDos(self.__tablero.tablero,fila,columna))
-                    for filas in self.__tablero.tablero:
-                        contadorDeBarcos += filas.count("X") 
-    
-    def colocarMarca(self,posY,posX):
-        if(self.__tablero.tablero[posY][posX] == ""):
-            self.__tablero.tablero[posY][posX]="O"
-        elif(self.__tablero.tablero[posY][posX] == "X"):
-            self.__tablero.tablero[posY][posX]="T"
+                    self.tableroClass.tablero = (Barcos.barcoDeDos(self.tableroClass.tablero,fila,columna))
+                    
+            for filas in self.tableroClass.tablero:
+                contadorDeBarcos += filas.count("X")
+
+    def colocarMarca(self, posY, posX):
+        if posY < 0 or posY >= len(self.tableroClass.tablero) or posX < 0 or posX >= len(self.tableroClass.tablero[0]):
+            output.showMensage("Posiciones no válidas.", True)
+            return
+        
+        if self.tableroClass.tablero[posY][posX] == "":
+            self.tableroClass.tablero[posY][posX] = "O"
+
+            output.showMensage("Fue agua mi capitán .",True)
+        elif self.tableroClass.tablero[posY][posX] == "X":
+            self.tableroClass.tablero[posY][posX] = "T"
+            self.comprobarMarca(posY,posX)
+            
         else:
-            output.showMensage("Posiciones nos validas.",True)
-class barcos:
+            output.showMensage("Posiciones no válidas.", True)
+
+
+    def comprobarMarca(self , posY , posX):
+        barcoTocado = False
+        if(posY == 0):
+            if (self.tableroClass.tablero[1][posX] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+            if(posX == 0 ):
+                if (self.tableroClass.tablero[posY][1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+            elif (posX == 7):
+                if (self.tableroClass.tablero[posY][6] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+            else:
+                if (self.tableroClass.tablero[posY][posX+1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+                if (self.tableroClass.tablero[posY][posX-1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+
+        elif(posY == 3):
+            if (self.tableroClass.tablero[2][posX] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+            if(posX == 0 ):
+                if (self.tableroClass.tablero[posY][1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+            elif (posX == 7):
+                if (self.tableroClass.tablero[posY][6] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+            else:
+                if (self.tableroClass.tablero[posY][posX+1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+                if (self.tableroClass.tablero[posY][posX-1] == "X"):
+                    output.showMensage("Se ha tocado barco "+self.nombre , True)
+                    barcoTocado = True
+
+        elif(posY != 0 and posY!=3 and posX!= 0 and posX!= 7):
+            if (self.tableroClass.tablero[posY+1][posX] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+            if (self.tableroClass.tablero[posY-1][posX] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+            if (self.tableroClass.tablero[posY][posX+1] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+            if (self.tableroClass.tablero[posY][posX-1] == "X"):
+                output.showMensage("Se ha tocado barco "+self.nombre , True)
+                barcoTocado = True
+
+        if(barcoTocado==False):
+            output.showMensage(self.nombre+" has undido un barco enemigo ." ,True)
+
+
+
+class Barcos:
 
     def barcoDeUno(tablero:list,posX,posY):
         if(tablero[posY][posX] == ""):
@@ -142,27 +218,32 @@ class mostrar:
     __compararTablero = compararTablero
 
 
-wninner =False
-tablero1 = tablero()
+winner =False
+tablero1 = Tablero()
 
 consola = inputs()
 
-jugador = player(tablero1)
+jugador = Player(tablero1)
 jugador.colocarBarcos()
 
 ver = mostrar(tablero1.tablero)
 
+ronda = 1
 
-while(wninner == False):
+while(winner == False):
+
+    output.showMensage("Ronda : "+ str(ronda) +"  /  Jugador : " + jugador.nombre , True)
+
     try:
         ver.mostrarTablero()
         consola.pedirLetra("Dame la letra: ")
         consola.pedirNum("Dame un numero: ")
 
-        print(consola.num)
+        tablero1.comprobarInput(consola.num,consola.letra,jugador)
 
+        winner = tablero1.comprobarGanador()
+        ronda += 1
+    except ValueError as e:
+            output.showMensage(str(e),True)
 
-        tablero1.comprobarInput(consola.num,consola.letra)
-
-    except ValueError:
-            output.showMensage("Datos no validos",True)
+output.showMensage("Has ganado " + jugador.nombre + " , eres de lo mejor.",True)
